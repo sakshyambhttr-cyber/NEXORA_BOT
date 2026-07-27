@@ -1,5 +1,5 @@
 /*
- * Combined Bot: Line Follow, Wall Follow and Bluetooth Manual
+ * THE EUROPA Bot: Line Follow, Wall Follow and Bluetooth Manual
  * Starts in AUTO Mode (Line Follow to Wall Follow)
  * Use SriTu Hobby App to control.
  * 
@@ -154,7 +154,7 @@ long readDistance(NewPing &sonar)
 void setup()
 {
   Serial.begin(115200);
-  SerialBT.begin("THE EUPORA"); // Bluetooth device name
+  SerialBT.begin("THE EUROPA"); // Bluetooth device name
   Serial.println("Bluetooth started — waiting for connection...");
 
   // IR sensors

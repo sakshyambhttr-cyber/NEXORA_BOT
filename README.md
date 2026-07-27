@@ -1,8 +1,8 @@
-# 🤖 NEXORA_BOT
+# 🤖 THE EUROPA
 
 > **Advanced ESP32-Powered Tri-Modal Autonomous & Remote-Controlled Hybrid Robotic System**
 
-NEXORA BOT is a state-of-the-art hybrid mobile robot built on the **ESP32 microcontroller**. It features seamless tri-modal operation, seamlessly switching between **Autonomous Line Following**, **Autonomous Ultrasonic Wall Following & Obstacle Navigation**, and **Bluetooth Remote Manual Control** with intelligent state-restoration logic.
+THE EUROPA is a state-of-the-art hybrid mobile robot built on the **ESP32 microcontroller**. It features seamless tri-modal operation, seamlessly switching between **Autonomous Line Following**, **Autonomous Ultrasonic Wall Following & Obstacle Navigation**, and **Bluetooth Remote Manual Control** with intelligent state-restoration logic.
 
 ---
 
@@ -14,7 +14,7 @@ NEXORA BOT is a state-of-the-art hybrid mobile robot built on the **ESP32 microc
 - 🔄 **Smart Autonomous Mode Transition**:
   - Automatically transitions from **Line Follow ➔ Wall Follow** when the line is lost and walls are detected within `34 cm`.
   - Automatically transitions back from **Wall Follow ➔ Line Follow** when the center IR sensor detects a line and open side space (`> 70 cm`) is detected.
-- 📲 **Dual-Tier Bluetooth Control ("THE EUPORA")**:
+- 📲 **Dual-Tier Bluetooth Control ("THE EUROPA")**:
   - **Temporary Manual Override**: Momentary directional controls ('U', 'D', 'L', 'R', diagonals) instantly take control. Releasing the control ('S') automatically resumes the previous autonomous state (`LINE` or `WALL`).
   - **Hard Manual Lock**: Toggle keys ('1', 'W', 'X', 'V') lock the bot into full manual mode, indicated via `CH1_PIN` (built-in LED). Toggling off ('2', 'w', 'x', 'v') restores autonomous mode.
 
@@ -90,7 +90,7 @@ flowchart TD
 
 ## 🎮 Bluetooth Control Protocol
 
-Broadcast Name: **`THE EUPORA`**  
+Broadcast Name: **`THE EUROPA`**  
 Recommended App: **SriTu Hobby App** or standard Bluetooth Serial RC Controller.
 
 | Command Key | Action / Movement | Mode Impact |
@@ -144,21 +144,21 @@ PWM_RESOLUTION = 8     // 8-bit resolution (0 - 255)
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com/sakshyambhttr-cyber/NEXORA_BOT.git
+   git clone https://github.com/sakshyambhttr-cyber/EUROPA_BOT.git
    ```
-2. Open `NEXORA_BOT.ino` in the Arduino IDE.
+2. Open `EUROPA_BOT.ino` in the Arduino IDE.
 3. Select your ESP32 board (e.g., **ESP32 Dev Module**) under `Tools > Board`.
 4. Connect the ESP32 via USB and select the appropriate COM port.
 5. Compile and upload the sketch.
-6. Pair your Android smartphone to Bluetooth device **`THE EUPORA`** using SriTu Hobby App.
+6. Pair your Android smartphone to Bluetooth device **`THE EUROPA`** using SriTu Hobby App.
 
 ---
 
 ## 📄 Repository Structure
 
 ```
-NEXORA_BOT/
-├── NEXORA_BOT.ino    # Complete ESP32 Control Sketch (Line/Wall Follow & Bluetooth)
+EUROPA_BOT/
+├── EUROPA_BOT.ino    # Complete ESP32 Control Sketch (Line/Wall Follow & Bluetooth)
 └── README.md         # Full Hardware, Software, & Pinout Documentation
 ```
 
