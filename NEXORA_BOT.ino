@@ -1,17 +1,14 @@
 /*
- * ============================================================
- *  Combined Bot: Line Follow, Wall Follow & Bluetooth Manual
- * ============================================================
- *  - Starts in AUTO Mode (Line Follow -> Wall Follow)
- *  - Use SriTu Hobby App to control.
- *  
- *  IMPROVED MODE SWITCHING:
- *  - Touch any movement arrow to TEMPORARILY override and drive manually.
- *    When you release the arrow, it goes back to Auto (Line/Wall) automatically.
- *  - Use the "Front Light" (W), "Switch" (X), or "Channel 1" (1) buttons in the 
- *    app to PERMANENTLY lock the robot into MANUAL mode. 
- *  - Turn them off (w, x, 2) to restore AUTO mode.
- * ============================================================
+ * Combined Bot: Line Follow, Wall Follow and Bluetooth Manual
+ * Starts in AUTO Mode (Line Follow to Wall Follow)
+ * Use SriTu Hobby App to control.
+ * 
+ * Mode Switching:
+ * Touch any movement arrow to temporarily override and drive manually.
+ * When you release the arrow it goes back to Auto mode automatically.
+ * Use Front Light (W), Switch (X), or Channel 1 (1) buttons in app
+ * to lock the robot into MANUAL mode.
+ * Turn them off (w, x, 2) to restore AUTO mode.
  */
 
 #include <BluetoothSerial.h>
@@ -19,7 +16,7 @@
 
 BluetoothSerial SerialBT;
 
-// ---------------- PIN DEFINITIONS ----------------
+// Pin definitions
 
 // IR line sensors
 #define left_ir    34
@@ -36,7 +33,7 @@ BluetoothSerial SerialBT;
 #define ENB 19
 
 // Channel pins
-#define CH1_PIN 2  // Channel 1 — built-in LED
+#define CH1_PIN 2  // Channel 1 built in LED
 #define CH2_PIN 23 // Channel 2
 
 // Ultrasonic pins
@@ -47,44 +44,44 @@ BluetoothSerial SerialBT;
 #define RIGHT_TRIG 33
 #define RIGHT_ECHO 13
 
-#define MAX_DISTANCE 200  // max distance to ping (cm)
+#define MAX_DISTANCE 200  // max distance to ping in cm
 
-// ---------------- TUNING (AUTO) ----------------
+// Tuning auto mode
 
-#define WALL_DIST      15   // desired distance from wall (cm)
-#define FRONT_STOP     25   // stop/turn if front obstacle closer than this
+#define WALL_DIST      15   // desired distance from wall in cm
+#define FRONT_STOP     25   // stop or turn if front obstacle closer than this
 #define BASE_SPEED     120
 #define TURN_SPEED     100
 
-#define SWITCH_DIST    34   // distance threshold (cm) to trigger line->wall switch
+#define SWITCH_DIST    34   // distance threshold in cm to trigger line to wall switch
 
-// ---------------- TUNING (MANUAL) ----------------
+// Tuning manual mode
 
 #define MOTOR_SPEED 120 
-#define MOTOR_SPEED_TUR 180 // 0-255  — normal drive speed
+#define MOTOR_SPEED_TUR 180 // 0 to 255 normal drive speed
 #define DIAGONAL_FAST 150 // outer wheel for diagonal moves
 #define DIAGONAL_SLOW 150 // inner wheel for diagonal moves
 
-// === PWM CONFIG ===
+// PWM configuration
 #define PWM_FREQ 4000
 #define PWM_RESOLUTION 8
 const int FRONT_LIMIT = 25;   // cm
 const int WALL_LIMIT  = 20;   // desired wall distance
 const int TOLERANCE   = 4;  
 
-// NewPing sensor objects
+// Sensor objects
 NewPing sonarLeft(LEFT_TRIG, LEFT_ECHO, MAX_DISTANCE);
 NewPing sonarFront(FRONT_TRIG, FRONT_ECHO, MAX_DISTANCE);
 NewPing sonarRight(RIGHT_TRIG, RIGHT_ECHO, MAX_DISTANCE);
 
-// ---------------- MODE ----------------
+// Mode variables
 
 enum Mode { MODE_LINE, MODE_WALL, MODE_MANUAL };
 Mode currentMode = MODE_LINE;       // Currently active mode
-Mode autoModeState = MODE_LINE;     // Remembers whether we were in LINE or WALL
-bool isHardManual = false;          // True if locked into manual via switch (W/X/1)
+Mode autoModeState = MODE_LINE;     // Remembers whether we were in line or wall mode
+bool isHardManual = false;          // True if locked into manual via switch
 
-// ---------------- LOW-LEVEL MOTOR CONTROL ----------------
+// Motor control functions
 
 void setMotors(int leftSpeedVal, int rightSpeedVal)
 {
@@ -120,7 +117,7 @@ void stopMotor()
   digitalWrite(rightmotor2, LOW);
 }
 
-// ---------------- AUTO MOTOR HELPERS ----------------
+// Auto mode motor helpers
 
 void forward()       { setMotors(BASE_SPEED, BASE_SPEED); }
 void back()          { setMotors(-BASE_SPEED, -BASE_SPEED); }
@@ -130,7 +127,8 @@ void right()         { setMotors(TURN_SPEED, -TURN_SPEED); }
 void right_wall()    { setMotors(TURN_SPEED -20, -TURN_SPEED);}
 void left()          { setMotors(-TURN_SPEED, TURN_SPEED); }
 void left_wall()     { setMotors(-TURN_SPEED, TURN_SPEED - 20);}
-// ---------------- MANUAL MOTOR HELPERS ----------------
+
+// Manual mode motor helpers
 
 void moveForward()   { setMotors(MOTOR_SPEED, MOTOR_SPEED); }
 void moveBackward()  { setMotors(-MOTOR_SPEED, -MOTOR_SPEED); }
@@ -142,7 +140,7 @@ void forwardRight()  { setMotors(DIAGONAL_FAST, DIAGONAL_SLOW); }
 void backwardLeft()  { setMotors(-DIAGONAL_SLOW, -DIAGONAL_FAST); }
 void backwardRight() { setMotors(-DIAGONAL_FAST, -DIAGONAL_SLOW); }
 
-// ---------------- ULTRASONIC HELPER ----------------
+// Ultrasonic helper function
 
 long readDistance(NewPing &sonar)
 {
@@ -151,7 +149,7 @@ long readDistance(NewPing &sonar)
   return cm;
 }
 
-// ---------------- SETUP ----------------
+// Setup function
 
 void setup()
 {
@@ -183,7 +181,7 @@ void setup()
   stopMotor();
 }
 
-// ---------------- LINE FOLLOWING ----------------
+// Line following function
 
 void lineFollow()
 {
@@ -235,7 +233,7 @@ void lineFollow()
   }
 }
 
-// ---------------- WALL FOLLOWING ----------------
+// Wall following function
 
 void wallFollow()
 {
@@ -287,16 +285,16 @@ void wallFollow()
   delay(20);
 }
 
-// ---------------- MAIN LOOP ----------------
+// Main loop
 
 void loop()
 {
-  // 1. Process Bluetooth Commands First
+  // Process Bluetooth commands first
   if (SerialBT.available()) {
     char cmd = SerialBT.read();
 
     switch (cmd) {
-    // ── Movement (Overrides to MANUAL temporarily) ──
+    // Movement temporary manual override
     case 'U': 
       if (currentMode != MODE_MANUAL) autoModeState = currentMode;
       currentMode = MODE_MANUAL; moveForward(); break;
@@ -310,7 +308,7 @@ void loop()
       if (currentMode != MODE_MANUAL) autoModeState = currentMode;
       currentMode = MODE_MANUAL; turnRight(); break;
 
-    // ── Diagonal ──
+    // Diagonal movement
     case 'T': 
       if (currentMode != MODE_MANUAL) autoModeState = currentMode;
       currentMode = MODE_MANUAL; forwardLeft(); break;
@@ -324,16 +322,16 @@ void loop()
       if (currentMode != MODE_MANUAL) autoModeState = currentMode;
       currentMode = MODE_MANUAL; backwardRight(); break;
 
-    // ── Stop (Reverts to Auto if not locked in Hard Manual) ──
+    // Stop command reverts to auto if not locked in hard manual
     case 'S': 
       stopMotor();
       if (!isHardManual && currentMode == MODE_MANUAL) {
-        currentMode = autoModeState; // Seamlessly resume Auto mode
+        currentMode = autoModeState; // Resume auto mode
       }
       break;
 
-    // ── Mode Switching (Hard Toggle via App Buttons) ──
-    // 1, W (Front Light), X (Switch) -> Lock into Manual Mode
+    // Mode switching via app buttons
+    // 1, W, X, V lock into manual mode
     case '1': case 'W': case 'X': case 'V':
       isHardManual = true;
       if (currentMode != MODE_MANUAL) autoModeState = currentMode;
@@ -343,7 +341,7 @@ void loop()
       Serial.println(">> Mode: HARD MANUAL (Locked)");
       break;
       
-    // 2, w (Front Light Off), x (Switch Off) -> Restore Auto Mode
+    // 2, w, x, v restore auto mode
     case '2': case 'w': case 'x': case 'v':
       isHardManual = false;
       currentMode = autoModeState;
@@ -357,7 +355,7 @@ void loop()
     }
   }
 
-  // 2. Execute behaviors based on current Mode
+  // Execute behaviors based on current mode
   if (currentMode == MODE_LINE)
   {
     lineFollow();
